@@ -32,7 +32,7 @@ if __name__ == '__main__':
         results_full.append(CrossdockListing(
             name=s['name'],
             description=s['description'],
-            address=s['location'],
+            location=s['location'],
             phone=s['phone'],
             email=connect_page_data['email']
         ))

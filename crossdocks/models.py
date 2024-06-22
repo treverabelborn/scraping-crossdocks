@@ -4,7 +4,7 @@ from typing import TypedDict
 class CrossdockListing(TypedDict):
     name: str
     description: str
-    address: str
+    location: str
     phone: str
     email: str
 
