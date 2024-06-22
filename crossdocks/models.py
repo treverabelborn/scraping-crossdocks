@@ -1,9 +1,24 @@
-from typing import TypedDict
+from dataclasses import dataclass
 
 
-class CrossDockListing(TypedDict):
+@dataclass
+class CrossdockListing:
     name: str
     description: str
     address: str
     phone: str
+    email: str
+
+
+@dataclass
+class CrossdockSearchData:
+    name: str
+    description: str
+    address: str
+    phone: str
+    href: str
+
+
+@dataclass
+class CrossdockInfoPageData:
     email: str

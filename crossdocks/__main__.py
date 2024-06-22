@@ -1,16 +1,17 @@
 import requests
-from parsel import Selector
-from .models import CrossDockListing
-from .strings import clean_str, extract_email
+import csv
+from .models import CrossdockListing, CrossdockSearchData, CrossdockInfoPageData
+from .scrapers import scrape_crossdocks, scrape_emails
 
 
 BASE_URL = 'https://www.crossdockbuddy.com'
-SEARCH_URI = '/search_results?page=1'
+SEARCH_URIS = ['/search_results?page=1',
+               '/search_results?page=2']
 
 
 if __name__ == '__main__':
-    session = requests.Session()
-    cookies = {
+    session: requests.Session = requests.Session()
+    cookies: dict = {
         'token': '588f83e6d914be13e05b4c4e0841aa10',
         'loggedin': '6dcc664f0b4e00d3b7a01ca2944a0a27',
         'userid': 'SFdmV1RaMktiUHVLaHhpbnNvUk5LdmRCTmxaL0dpd2oyTGtKY1JHU1M2RT0%3D%7C%7C832095414609cec90efaadd7d3e991a019aa4b5d64b50a96cbcf8846954cbb86',
@@ -18,35 +19,26 @@ if __name__ == '__main__':
         'subscription_id': '2',
         'profession_id': '0'
     }
-    html = session.get('{}{}'.format(BASE_URL, SEARCH_URI), cookies=cookies).text
-    selector = Selector(text=html)
-    listings = selector.xpath('//div[@class="grid_element"]')
 
-    for i in range(0, len(listings)):
-        listing = listings[i]
-        mid_section = listing.xpath('div[contains(@class, "mid_section")]')
-        name = mid_section.xpath('a/@title').get()
-        desc = mid_section.xpath('p[contains(@class, "member-search-description")]//text()').get()
-        location = mid_section.xpath('span[contains(@class, "member-search-location")]')
-        address_city = location.xpath('small//text()').get()
-        address_zip = location.xpath('small/span[1]//text()').get()
-        address_country = location.xpath('small/span[2]//text()').get()
-        address = '{}{}, {}'.format(address_city, address_zip, address_country)
-        href = mid_section.xpath('a/@href').get()
-        phone = listing.xpath('div[contains(@class, "info_section")]/div/span[contains(@class, "member-search-phone")]/i/following-sibling::text()').get()
-        connect_html = session \
-            .get('{}{}/connect'.format(BASE_URL, href), cookies=cookies) \
-            .text
-        connect_selector = Selector(connect_html)
-        js = connect_selector.xpath('//script[contains(text(),"resend_verification_email")]//text()').get()
-        email = extract_email(js)
-        
-        result = CrossDockListing(
-            name=name,
-            description=clean_str(desc),
-            address=clean_str(address),
-            phone=clean_str(phone),
-            email=email
-        )
-        print('index: ' + str(i))
-        print(result)
+    results_search: list[CrossdockSearchData] = []
+    for search_page in SEARCH_URIS:
+        search_page_html: str = session.get('{}{}'.format(BASE_URL, search_page), cookies=cookies).text
+        search_page_data: list[CrossdockSearchData] = scrape_crossdocks(search_page_html)
+        results_search = results_search + search_page_data
+
+    results_full: list[CrossdockListing] = []
+    for s in results_search:
+        connect_page_html: str = session.get('{}{}/connect'.format(BASE_URL, s.href), cookies=cookies).text
+        connect_page_data: CrossdockInfoPageData = scrape_emails(connect_page_html)
+        results_full.append(CrossdockListing(
+            name=s.name,
+            description=s.description,
+            address=s.address,
+            phone=s.phone,
+            email=connect_page_data.email
+        ))
+    
+    with open('output.csv', 'w', newline='') as out_file:
+        writer = csv.DictWriter(out_file, results_full[0].keys())
+        writer.writeheader()
+        writer.writerows(results_full)
