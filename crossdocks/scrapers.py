@@ -13,17 +13,17 @@ def scrape_crossdocks(search_page_html) -> list[CrossdockSearchData]:
         name = mid_section.xpath('a/@title').get()
         desc = mid_section.xpath('p[contains(@class, "member-search-description")]//text()').get()
         location = mid_section.xpath('span[contains(@class, "member-search-location")]')
-        address_city = location.xpath('small//text()').get()
-        address_zip = location.xpath('small/span[1]//text()').get()
-        address_country = location.xpath('small/span[2]//text()').get()
-        address = '{}{}, {}'.format(address_city, address_zip, address_country)
+        location_city = location.xpath('small//text()').get()
+        location_zip = location.xpath('small/span[1]//text()').get()
+        location_country = location.xpath('small/span[2]//text()').get()
+        location = '{}{}, {}'.format(location_city, location_zip, location_country)
         href = mid_section.xpath('a/@href').get()
         phone = listing.xpath('div[contains(@class, "info_section")]/div/span[contains(@class, "member-search-phone")]/i/following-sibling::text()').get()
 
         results.append(CrossdockSearchData(
             name=name,
             description=clean_str(desc),
-            address=clean_str(address),
+            location=clean_str(location),
             phone=clean_str(phone),
             href=href
         ))

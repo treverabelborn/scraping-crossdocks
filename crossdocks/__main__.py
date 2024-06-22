@@ -5,8 +5,7 @@ from .scrapers import scrape_crossdocks, scrape_emails
 
 
 BASE_URL = 'https://www.crossdockbuddy.com'
-SEARCH_URIS = ['/search_results?page=1',
-               '/search_results?page=2']
+SEARCH_URIS = ['/search_results?page=1', '/search_results?page=2']
 
 
 if __name__ == '__main__':
@@ -28,16 +27,16 @@ if __name__ == '__main__':
 
     results_full: list[CrossdockListing] = []
     for s in results_search:
-        connect_page_html: str = session.get('{}{}/connect'.format(BASE_URL, s.href), cookies=cookies).text
+        connect_page_html: str = session.get('{}{}/connect'.format(BASE_URL, s['href']), cookies=cookies).text
         connect_page_data: CrossdockInfoPageData = scrape_emails(connect_page_html)
         results_full.append(CrossdockListing(
-            name=s.name,
-            description=s.description,
-            address=s.address,
-            phone=s.phone,
-            email=connect_page_data.email
+            name=s['name'],
+            description=s['description'],
+            address=s['location'],
+            phone=s['phone'],
+            email=connect_page_data['email']
         ))
-    
+
     with open('output.csv', 'w', newline='') as out_file:
         writer = csv.DictWriter(out_file, results_full[0].keys())
         writer.writeheader()

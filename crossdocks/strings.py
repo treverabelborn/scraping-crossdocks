@@ -11,11 +11,11 @@ def clean_str(str):
 
 
 def email_end_idx(js):
-    top_level_domains = ['com`', '.COM`', '.net`', '.NET`', '.us`', '.site`', '.info`', '.ws`']
+    top_level_domains = ['.com`', '.COM`', '.net`', '.NET`', '.us`', '.site`', '.info`', '.ws`', '.co`']
 
     for tld in top_level_domains:
         if tld in js:
-            return js.index(tld) + len(tld)
+            return js.index(tld) + len(tld) - 1
     
     print(js)
     raise Exception('Failed to get email')

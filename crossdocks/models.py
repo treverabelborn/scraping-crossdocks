@@ -1,8 +1,7 @@
-from dataclasses import dataclass
+from typing import TypedDict
 
 
-@dataclass
-class CrossdockListing:
+class CrossdockListing(TypedDict):
     name: str
     description: str
     address: str
@@ -10,15 +9,13 @@ class CrossdockListing:
     email: str
 
 
-@dataclass
-class CrossdockSearchData:
+class CrossdockSearchData(TypedDict):
     name: str
     description: str
-    address: str
+    location: str
     phone: str
     href: str
 
 
-@dataclass
-class CrossdockInfoPageData:
+class CrossdockInfoPageData(TypedDict):
     email: str
