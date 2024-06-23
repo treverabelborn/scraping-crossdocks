@@ -6,6 +6,7 @@ class CrossdockListing(TypedDict):
     description: str
     location: str
     phone: str
+    info_page_url: str
     email: str
 
 
@@ -14,8 +15,4 @@ class CrossdockSearchData(TypedDict):
     description: str
     location: str
     phone: str
-    href: str
-
-
-class CrossdockInfoPageData(TypedDict):
-    email: str
+    info_page_url: str

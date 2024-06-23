@@ -1,5 +1,6 @@
+import re
 from parsel import Selector
-from .models import CrossdockSearchData, CrossdockInfoPageData
+from .models import CrossdockSearchData
 from .strings import clean_str, extract_email
 
 
@@ -33,10 +34,15 @@ def scrape_crossdocks(search_page_html) -> list[CrossdockSearchData]:
     return results
 
 
-def scrape_emails(connect_page_html):
+def scrape_email_cb(connect_page_html):
     connect_selector = Selector(connect_page_html)
     js = connect_selector.xpath('//script[contains(text(),"resend_verification_email")]//text()').get()
 
-    return CrossdockInfoPageData(
-        email=extract_email(js)
-    )
+    return extract_email(js)
+
+
+def scrape_email_google(google_search_html):
+    selector = Selector(google_search_html)
+    email = selector.re_first(r"(([a-zA-Z0-9\.\-_](?!>))+@[a-zA-Z0-9]+\.([a-zA-Z0-9])+)+")
+    print(email)
+    return email
