@@ -43,6 +43,6 @@ def scrape_email_cb(connect_page_html):
 
 def scrape_email_google(google_search_html):
     selector = Selector(google_search_html)
-    email = selector.re_first(r"(([a-zA-Z0-9\.\-_](?!>))+@[a-zA-Z0-9]+\.([a-zA-Z0-9])+)+")
+    email = selector.re_first(r"[a-zA-Z0-9\.\-_]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]+")
     print(email)
     return email
